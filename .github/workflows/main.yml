@@ -322,6 +322,63 @@ jobs:
           2ship.appimage
           readme.txt
 
+  build-wiiu:
+    needs: generate-2ship-otr
+    runs-on: ubuntu-22.04
+    container:
+      image: devkitpro/devkitppc:20240609
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y ninja-build
+        sudo apt-get remove -y cmake
+        wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh -O /tmp/cmake.sh
+        sudo sh /tmp/cmake.sh --prefix=/usr/local/ --exclude-subdir
+        mkdir wut
+        cd wut
+        git init .
+        git remote add origin https://github.com/devkitPro/wut.git
+        git fetch --depth 1 origin f17054e3e86222c14a1094639558d34b690636ed
+        git checkout FETCH_HEAD
+        make -j$(nproc)
+        make install
+        cd ..
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1.2.13
+      with:
+        key: wiiu-ccache-${{ github.ref }}-${{ github.sha }}
+        restore-keys: |
+          wiiu-ccache-${{ github.ref }}
+          wiiu-ccache-
+    - name: Build 2Ship
+      run: |
+        cmake -H. -Bbuild-wiiu -GNinja -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/WiiU.cmake -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache
+        cmake --build build-wiiu --target 2ship_wuhb --config Release -j3
+
+        mv build-wiiu/mm/*.rpx 2ship.rpx
+        mv build-wiiu/mm/*.wuhb 2ship.wuhb
+        mv README.md readme.txt
+      env:
+        DEVKITPRO: /opt/devkitpro
+        DEVKITPPC: /opt/devkitpro/devkitPPC
+    - name: Download 2ship.o2r
+      uses: actions/download-artifact@v4
+      with:
+        name: 2ship.o2r
+    - name: Upload build
+      uses: actions/upload-artifact@v4
+      with:
+        name: 2ship-wiiu
+        path: |
+          2ship.rpx
+          2ship.wuhb
+          2ship.o2r
+          readme.txt
+
   build-windows:
     needs: generate-2ship-otr
     runs-on: windows-latest
