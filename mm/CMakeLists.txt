@@ -671,8 +671,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "CafeOS")
     set(ADDITIONAL_LIBRARY_DEPENDENCIES
         "libultraship;"
         SDL2::SDL2-static
-
-        "$<$<CONFIG:Debug>:-Wl,--wrap=abort>"
     )
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${DEVKITPRO}/portlibs/wiiu/include/
@@ -748,7 +746,7 @@ wut_create_wuhb(${PROJECT_NAME}
 	NAME       "Two Ship Two Harkinian"
 	SHORTNAME  "2S2H"
 	AUTHOR     "${PROJECT_TEAM}"
-	ICON       ${CMAKE_CURRENT_SOURCE_DIR}/icon.jpg
+	ICON       ${CMAKE_CURRENT_SOURCE_DIR}/linux/2s2hIcon.png
 )
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/2s2h.rpx ${CMAKE_CURRENT_BINARY_DIR}/2s2h.wuhb DESTINATION . COMPONENT 2s2h)

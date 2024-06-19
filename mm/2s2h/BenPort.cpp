@@ -463,7 +463,7 @@ extern "C" void InitOTR() {
 #ifdef __SWITCH__
     Ship::Switch::Init(Ship::PreInitPhase);
 #elif defined(__WIIU__)
-    Ship::WiiU::Init("soh");
+    Ship::WiiU::Init(appShortName);
 #endif
 
     OTRGlobals::Instance = new OTRGlobals();
@@ -500,6 +500,10 @@ extern "C" void InitOTR() {
 #endif
 
     std::shared_ptr<Ship::Config> conf = OTRGlobals::Instance->context->GetConfig();
+
+#if defined(__SWITCH__) || defined(__WIIU__)
+    CVarRegisterInteger(CVAR_IMGUI_CONTROLLER_NAV, 1); // always enable controller nav on switch/wii u
+#endif
 }
 
 extern "C" void SaveManager_ThreadPoolWait() {
