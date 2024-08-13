@@ -138,7 +138,6 @@ jobs:
       run: |
         sudo apt-get install -y ninja-build
         sudo apt-get remove -y cmake
-        sudo apt-get install -y vcpkg
         wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh -O /tmp/cmake.sh
         sudo sh /tmp/cmake.sh --prefix=/usr/local/ --exclude-subdir
         wget https://libzip.org/download/libzip-1.10.1.tar.gz
@@ -146,6 +145,12 @@ jobs:
         cd libzip-1.10.1
         mkdir build
         cd build
+        cmake -H.. -B. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
+        make
+        make install
+        cd ../..
+        git clone https://github.com/gabime/spdlog.git
+        cd spdlog && mkdir build && cd build
         cmake -H.. -B. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
         make
         make install
@@ -160,6 +165,7 @@ jobs:
         make install
         cd ../..
 
+
     - uses: actions/checkout@v4
       with:
         submodules: true
@@ -172,7 +178,6 @@ jobs:
           switch-ccache-
     - name: Build 2Ship
       run: |
-        vcpkg install spdlog
         cmake -H. -Bbuild-switch -GNinja -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache
         cmake --build build-switch --target 2ship_nro --config Release -j3
 
