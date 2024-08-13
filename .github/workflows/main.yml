@@ -150,6 +150,14 @@ jobs:
         make
         make install
         cd ../..
+        git clone https://github.com/gabime/spdlog.git
+        cd spdlog
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=/opt/devkitpro/portlibs/switch
+        make -j$(nproc)
+        make install
+        cd ../..
         wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
         tar -xzvf v3.11.3.tar.gz
         cd json-3.11.3
