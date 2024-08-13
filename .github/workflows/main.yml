@@ -137,6 +137,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y ninja-build
+        sudo apt install -y libspdlog-dev
         sudo apt-get remove -y cmake
         wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh -O /tmp/cmake.sh
         sudo sh /tmp/cmake.sh --prefix=/usr/local/ --exclude-subdir
@@ -145,12 +146,6 @@ jobs:
         cd libzip-1.10.1
         mkdir build
         cd build
-        cmake -H.. -B. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
-        make
-        make install
-        cd ../..
-        git clone https://github.com/gabime/spdlog.git
-        cd spdlog && mkdir build && cd build
         cmake -H.. -B. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
         make
         make install
