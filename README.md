@@ -17,3 +17,5 @@ cmake --build build-wiiu --target 2ship
 # build wuhb
 cmake --build build-wiiu --target 2ship_wuhb
 ```
+
+Test
