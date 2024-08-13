@@ -290,7 +290,7 @@ jobs:
     needs: generate-2ship-otr
     runs-on: ubuntu-22.04
     container:
-      image: devkitpro/devkita64:20240609
+      image: devkitpro/devkita64:20240120
     steps:
     - name: Install dependencies
       run: |
