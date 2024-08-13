@@ -139,15 +139,24 @@ jobs:
         sudo apt-get remove -y cmake
         wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh -O /tmp/cmake.sh
         sudo sh /tmp/cmake.sh --prefix=/usr/local/ --exclude-subdir
-        mkdir libnx
-        cd libnx
-        git init .
-        git remote add origin https://github.com/switchbrew/libnx.git
-        git fetch --depth 1 origin 3c851a3443eb844b400ee6c157f9795a7ce267a3
-        git checkout FETCH_HEAD
-        make -j$(nproc)
+        wget https://libzip.org/download/libzip-1.10.1.tar.gz
+        tar -xzvf libzip-1.10.1.tar.gz
+        cd libzip-1.10.1
+        mkdir build
+        cd build
+        cmake -H.. -B. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
+        make
         make install
-        cd ..
+        cd ../..
+        wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
+        tar -xzvf v3.11.3.tar.gz
+        cd json-3.11.3
+        mkdir build
+        cd build
+        cmake -H.. -B. -DJSON_BuildTests=OFF -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
+        make
+        make install
+        cd ../..
 
     - uses: actions/checkout@v4
       with:
