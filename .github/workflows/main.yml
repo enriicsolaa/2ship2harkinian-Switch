@@ -378,6 +378,62 @@ jobs:
           2ship.wuhb
           2ship.o2r
           readme.txt
+  
+    build-switch:
+    needs: generate-2ship-otr
+    runs-on: ubuntu-22.04
+    container:
+      image: devkitpro/devkita64:20240609
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y ninja-build
+        sudo apt-get remove -y cmake
+        wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh -O /tmp/cmake.sh
+        sudo sh /tmp/cmake.sh --prefix=/usr/local/ --exclude-subdir
+        mkdir libnx
+        cd libnx
+        git init .
+        git remote add origin https://github.com/switchbrew/libnx.git
+        git fetch --depth 1 origin 89326e8bff0ddcc4bde6f7e8fe2c1c4d5b905823
+        git checkout FETCH_HEAD
+        make -j$(nproc)
+        make install
+        cd ..
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1.2.13
+      with:
+        key: switch-ccache-${{ github.ref }}-${{ github.sha }}
+        restore-keys: |
+          switch-ccache-${{ github.ref }}
+          switch-ccache-
+    - name: Build 2Ship
+      run: |
+        cmake -H. -Bbuild-switch -GNinja -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache
+        cmake --build build-switch --target 2ship_nro --config Release -j3
+
+        mv build-switch/mm/*.nro 2ship.nro
+        mv README.md readme.txt
+      env:
+        DEVKITPRO: /opt/devkitpro
+        DEVKITARM: /opt/devkitpro/devkitA64
+    - name: Download 2ship.o2r
+      uses: actions/download-artifact@v4
+      with:
+        name: 2ship.o2r
+    - name: Upload build
+      uses: actions/upload-artifact@v4
+      with:
+        name: 2ship-switch
+        path: |
+          2ship.nro
+          2ship.o2r
+          readme.txt
+
 
   build-windows:
     needs: generate-2ship-otr
