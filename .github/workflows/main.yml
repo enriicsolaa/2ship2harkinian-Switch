@@ -1,6 +1,10 @@
 name: generate-builds
 on:
   push:
+    branches:
+      - develop
+
+jobs:
   generate-2ship-otr:
     runs-on: ubuntu-22.04
     steps:
